@@ -6,7 +6,6 @@
   <title>Speedcubing Average Calculator</title>
   <meta name="description" content="A specialized calculator for Rubik's Cube speedsolvers to calculate different types of averages from solve times, including Middle 3 Average, Best Possible Average, and Worst Possible Average.">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
       /* Dark Theme */
@@ -23,14 +22,280 @@
       --radius: 0.5rem;
     }
 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       background-color: var(--background);
       color: var(--foreground);
       font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 32rem;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .min-h-screen {
+      min-height: 100vh;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .flex-col {
+      flex-direction: column;
+    }
+
+    .flex-1 {
+      flex: 1;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .justify-center {
+      justify-content: center;
+    }
+
+    .justify-between {
+      justify-content: space-between;
+    }
+
+    .gap-2 {
+      gap: 0.5rem;
+    }
+
+    .text-center {
+      text-align: center;
     }
 
     .font-mono {
       font-family: 'Roboto Mono', monospace;
+    }
+
+    .text-xs {
+      font-size: 0.75rem;
+    }
+
+    .text-sm {
+      font-size: 0.875rem;
+    }
+
+    .text-md {
+      font-size: 1rem;
+    }
+
+    .text-lg {
+      font-size: 1.125rem;
+    }
+
+    .text-xl {
+      font-size: 1.25rem;
+    }
+
+    .text-2xl {
+      font-size: 1.5rem;
+    }
+
+    .text-3xl {
+      font-size: 1.875rem;
+    }
+
+    .font-medium {
+      font-weight: 500;
+    }
+
+    .font-semibold {
+      font-weight: 600;
+    }
+
+    .font-bold {
+      font-weight: 700;
+    }
+
+    .mb-1 {
+      margin-bottom: 0.25rem;
+    }
+
+    .mb-2 {
+      margin-bottom: 0.5rem;
+    }
+
+    .mb-3 {
+      margin-bottom: 0.75rem;
+    }
+
+    .mb-4 {
+      margin-bottom: 1rem;
+    }
+
+    .mb-5 {
+      margin-bottom: 1.25rem;
+    }
+
+    .mb-6 {
+      margin-bottom: 1.5rem;
+    }
+
+    .mb-7 {
+      margin-bottom: 1.75rem;
+    }
+
+    .mt-1 {
+      margin-top: 0.25rem;
+    }
+
+    .mt-2 {
+      margin-top: 0.5rem;
+    }
+
+    .mt-3 {
+      margin-top: 0.75rem;
+    }
+
+    .mt-4 {
+      margin-top: 1rem;
+    }
+
+    .mt-5 {
+      margin-top: 1.25rem;
+    }
+
+    .mt-6 {
+      margin-top: 1.5rem;
+    }
+
+    .mx-auto {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .px-4 {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .px-5 {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+
+    .py-2 {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .py-3 {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+
+    .py-4 {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .py-6 {
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+
+    .py-8 {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+
+    .p-0 {
+      padding: 0;
+    }
+
+    .p-6 {
+      padding: 1.5rem;
+    }
+
+    .w-full {
+      width: 100%;
+    }
+
+    .block {
+      display: block;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .relative {
+      position: relative;
+    }
+
+    .absolute {
+      position: absolute;
+    }
+
+    .right-3 {
+      right: 0.75rem;
+    }
+
+    .top-2\.5 {
+      top: 0.625rem;
+    }
+
+    .space-y-2 > * + * {
+      margin-top: 0.5rem;
+    }
+
+    .space-y-3 > * + * {
+      margin-top: 0.75rem;
+    }
+
+    .space-y-4 > * + * {
+      margin-top: 1rem;
+    }
+
+    .space-y-5 > * + * {
+      margin-top: 1.25rem;
+    }
+
+    .border {
+      border: 1px solid var(--accent);
+    }
+
+    .border-t {
+      border-top: 1px solid var(--accent);
+    }
+
+    .border-b {
+      border-bottom: 1px solid var(--accent);
+    }
+
+    .rounded-lg {
+      border-radius: 0.5rem;
+    }
+
+    .shadow-md {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .shadow-lg {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .pb-4 {
+      padding-bottom: 1rem;
+    }
+
+    .pb-5 {
+      padding-bottom: 1.25rem;
     }
 
     .card {
@@ -48,6 +313,7 @@
       padding: 0.5rem 1rem;
       font-family: 'Roboto Mono', monospace;
       font-size: 1.125rem;
+      width: 100%;
     }
 
     input[type=number]:focus {
@@ -64,6 +330,7 @@
       padding: 0.75rem 1rem;
       cursor: pointer;
       transition: all 0.2s ease;
+      font-size: 0.875rem;
     }
 
     button:hover {
@@ -133,6 +400,22 @@
       visibility: visible;
       opacity: 1;
     }
+
+    .list-disc {
+      list-style-type: disc;
+      padding-left: 1.25rem;
+    }
+
+    @media (min-width: 768px) {
+      .md\:px-6 {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+      
+      .md\:text-2xl {
+        font-size: 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -143,7 +426,7 @@
       </div>
     </header>
 
-    <main class="container mx-auto px-4 md:px-6 py-8 max-w-lg flex-1">
+    <main class="container mx-auto px-4 md:px-6 py-8 flex-1">
       <!-- Input Section -->
       <div class="card mb-6 p-6">
         <h2 class="text-xl font-semibold mb-4 text-primary">Enter Solve Times</h2>
@@ -151,12 +434,60 @@
           Enter times in hundredths of seconds (e.g., 859 = 8.59 seconds). Use 99999 for DNF.
         </p>
         
-        <div class="space-y-5" id="input-container">
-          <!-- Input fields will be generated here -->
+        <div class="space-y-5">
+          <!-- Solve 1 -->
+          <div>
+            <label for="solve-0" class="block text-sm font-medium mb-2">Solve 1</label>
+            <div class="relative">
+              <input id="solve-0" type="number" placeholder="Enter time in hundredths" min="0" max="99999">
+              <div id="status-0" class="absolute right-3 top-2.5 hidden"></div>
+            </div>
+            <p id="formatted-time-0" class="mt-1 text-xs text-muted">0.00s</p>
+          </div>
+          
+          <!-- Solve 2 -->
+          <div>
+            <label for="solve-1" class="block text-sm font-medium mb-2">Solve 2</label>
+            <div class="relative">
+              <input id="solve-1" type="number" placeholder="Enter time in hundredths" min="0" max="99999">
+              <div id="status-1" class="absolute right-3 top-2.5 hidden"></div>
+            </div>
+            <p id="formatted-time-1" class="mt-1 text-xs text-muted">0.00s</p>
+          </div>
+          
+          <!-- Solve 3 -->
+          <div>
+            <label for="solve-2" class="block text-sm font-medium mb-2">Solve 3</label>
+            <div class="relative">
+              <input id="solve-2" type="number" placeholder="Enter time in hundredths" min="0" max="99999">
+              <div id="status-2" class="absolute right-3 top-2.5 hidden"></div>
+            </div>
+            <p id="formatted-time-2" class="mt-1 text-xs text-muted">0.00s</p>
+          </div>
+          
+          <!-- Solve 4 -->
+          <div>
+            <label for="solve-3" class="block text-sm font-medium mb-2">Solve 4</label>
+            <div class="relative">
+              <input id="solve-3" type="number" placeholder="Enter time in hundredths" min="0" max="99999">
+              <div id="status-3" class="absolute right-3 top-2.5 hidden"></div>
+            </div>
+            <p id="formatted-time-3" class="mt-1 text-xs text-muted">0.00s</p>
+          </div>
+          
+          <!-- Solve 5 -->
+          <div>
+            <label for="solve-4" class="block text-sm font-medium mb-2">Solve 5</label>
+            <div class="relative">
+              <input id="solve-4" type="number" placeholder="Enter time in hundredths" min="0" max="99999">
+              <div id="status-4" class="absolute right-3 top-2.5 hidden"></div>
+            </div>
+            <p id="formatted-time-4" class="mt-1 text-xs text-muted">0.00s</p>
+          </div>
         </div>
         
         <div class="mt-6">
-          <button id="reset-button" class="w-full px-4 py-3 text-sm flex items-center justify-center gap-2">
+          <button id="reset-button" class="w-full px-4 py-3 flex items-center justify-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
             Reset All Times
           </button>
@@ -255,10 +586,10 @@
           <p>Enter your times in hundredths of seconds. For example, a time of 12.34 seconds should be entered as 1234.</p>
           <p>For a DNF (Did Not Finish), enter 99999.</p>
           <p>The calculator provides three key metrics:</p>
-          <ul class="list-disc pl-5 space-y-2">
-            <li><strong>Middle 3 Average (Ao5):</strong> The average of 5 solves after removing the fastest and slowest times.</li>
-            <li><strong>Best Possible Average (BPA):</strong> After 4 solves, this shows the best average you can achieve with an optimal 5th solve.</li>
-            <li><strong>Worst Possible Average (WPA):</strong> After 4 solves, this shows the worst average you would get with a DNF on the 5th solve.</li>
+          <ul class="list-disc space-y-2">
+            <li><strong style="color: var(--foreground);">Middle 3 Average (Ao5):</strong> The average of 5 solves after removing the fastest and slowest times.</li>
+            <li><strong style="color: var(--foreground);">Best Possible Average (BPA):</strong> After 4 solves, this shows the best average you can achieve with an optimal 5th solve.</li>
+            <li><strong style="color: var(--foreground);">Worst Possible Average (WPA):</strong> After 4 solves, this shows the worst average you would get with a DNF on the 5th solve.</li>
           </ul>
           <p>All calculations follow official WCA competition rules for averages.</p>
         </div>
@@ -280,8 +611,14 @@
     // State
     let solves = [null, null, null, null, null];
     let formattedTimes = ["0.00s", "0.00s", "0.00s", "0.00s", "0.00s"];
-    let validInputs = [false, false, false, false, false];
-    let errorInputs = [false, false, false, false, false];
+
+    // DOM Elements
+    const resetButton = document.getElementById('reset-button');
+    const middle3AvgElement = document.getElementById('middle-3-avg');
+    const fastestTimeElement = document.getElementById('fastest-time');
+    const slowestTimeElement = document.getElementById('slowest-time');
+    const bpaElement = document.getElementById('bpa');
+    const wpaElement = document.getElementById('wpa');
 
     // Utility Functions
     function formatTime(timeInHundredths) {
@@ -418,77 +755,19 @@
       return sum / 3;
     }
 
-    // DOM Elements
-    const inputContainer = document.getElementById('input-container');
-    const resetButton = document.getElementById('reset-button');
-    const middle3AvgElement = document.getElementById('middle-3-avg');
-    const fastestTimeElement = document.getElementById('fastest-time');
-    const slowestTimeElement = document.getElementById('slowest-time');
-    const bpaElement = document.getElementById('bpa');
-    const wpaElement = document.getElementById('wpa');
-
-    // Initialize input fields
-    function createInputFields() {
-      inputContainer.innerHTML = '';
-      
-      for (let i = 0; i < 5; i++) {
-        const inputWrapper = document.createElement('div');
-        
-        const label = document.createElement('label');
-        label.setAttribute('for', `solve-${i}`);
-        label.className = 'block text-sm font-medium mb-2';
-        label.textContent = `Solve ${i + 1}`;
-        
-        const inputContainer = document.createElement('div');
-        inputContainer.className = 'relative';
-        
-        const input = document.createElement('input');
-        input.id = `solve-${i}`;
-        input.type = 'number';
-        input.className = 'w-full';
-        input.placeholder = 'Enter time in hundredths';
-        input.min = 0;
-        input.max = 99999;
-        input.dataset.index = i;
-        
-        input.addEventListener('input', handleTimeInput);
-        input.addEventListener('focus', (e) => e.currentTarget.select());
-        
-        const statusIcon = document.createElement('div');
-        statusIcon.className = 'absolute right-3 top-2.5 hidden';
-        statusIcon.id = `status-${i}`;
-        
-        const formattedDisplay = document.createElement('p');
-        formattedDisplay.className = 'mt-1 text-xs text-muted';
-        formattedDisplay.id = `formatted-time-${i}`;
-        formattedDisplay.textContent = formattedTimes[i];
-        
-        inputContainer.appendChild(input);
-        inputContainer.appendChild(statusIcon);
-        
-        inputWrapper.appendChild(label);
-        inputWrapper.appendChild(inputContainer);
-        inputWrapper.appendChild(formattedDisplay);
-        
-        inputContainer.appendChild(input);
-        
-        this.inputContainer.appendChild(inputWrapper);
-      }
-    }
-
     // Event Handlers
     function handleTimeInput(e) {
-      const index = parseInt(e.target.dataset.index);
-      const value = e.target.value.trim();
+      const input = e.target;
+      const index = parseInt(input.id.split('-')[1]);
+      const value = input.value.trim();
       
       // Get status icons and formatted time displays
       const statusIcon = document.getElementById(`status-${index}`);
       const formattedDisplay = document.getElementById(`formatted-time-${index}`);
       
-      // Reset validations
-      validInputs[index] = false;
-      errorInputs[index] = false;
+      // Reset status icon
       statusIcon.className = 'absolute right-3 top-2.5 hidden';
+      statusIcon.innerHTML = '';
       
       // Clear the field if empty
       if (value === '') {
@@ -501,7 +780,6 @@
         // Validate input
         if (!isNaN(timeValue) && timeValue >= 0 && timeValue <= DNF_VALUE) {
           solves[index] = timeValue;
-          validInputs[index] = true;
           
           // Format time display
           if (timeValue === DNF_VALUE) {
@@ -515,7 +793,6 @@
           statusIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
         } else {
           // Show error for invalid input
-          errorInputs[index] = true;
           formattedTimes[index] = "Invalid";
           solves[index] = null;
           
@@ -541,8 +818,6 @@
       // Reset all state
       solves = [null, null, null, null, null];
       formattedTimes = ["0.00s", "0.00s", "0.00s", "0.00s", "0.00s"];
-      validInputs = [false, false, false, false, false];
-      errorInputs = [false, false, false, false, false];
       
       // Update display
       for (let i = 0; i < 5; i++) {
@@ -550,6 +825,7 @@
         const formattedDisplay = document.getElementById(`formatted-time-${i}`);
         
         statusIcon.className = 'absolute right-3 top-2.5 hidden';
+        statusIcon.innerHTML = '';
         formattedDisplay.textContent = "0.00s";
       }
       
@@ -610,7 +886,14 @@
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-      createInputFields();
+      // Add event listeners to all input fields
+      for (let i = 0; i < 5; i++) {
+        const input = document.getElementById(`solve-${i}`);
+        input.addEventListener('input', handleTimeInput);
+        input.addEventListener('focus', (e) => e.target.select());
+      }
+      
+      // Add event listener to reset button
       resetButton.addEventListener('click', resetInputs);
     });
   </script>
