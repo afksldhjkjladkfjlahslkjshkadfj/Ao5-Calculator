@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speedcubing Average Calculator</title>
+  <meta name="description" content="A specialized calculator for Rubik's Cube speedsolvers to calculate different types of averages from solve times, including Middle 3 Average, Best Possible Average, and Worst Possible Average.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      /* Dark Theme */
+      --background: #121212;
+      --foreground: #FAFAFA;
+      --primary: #3B82F6;
+      --secondary: #0EA5E9;
+      --accent: #334155;
+      --destructive: #EF4444;
+      --muted: #1E293B;
+      --muted-foreground: #94A3B8;
+      --card: #0F172A;
+      --border: #1E293B;
+      --radius: 0.5rem;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--foreground);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .font-mono {
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    .card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--accent);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type=number] {
+      background-color: rgba(51, 65, 85, 0.3);
+      border: 1px solid var(--accent);
+      color: var(--foreground);
+      border-radius: var(--radius);
+      padding: 0.5rem 1rem;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 1.125rem;
+    }
+
+    input[type=number]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    button {
+      background-color: var(--accent);
+      color: var(--foreground);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background-color: rgba(51, 65, 85, 0.7);
+    }
+
+    .result-box {
+      background-color: rgba(51, 65, 85, 0.3);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+    }
+
+    .text-primary {
+      color: var(--primary);
+    }
+
+    .text-secondary {
+      color: var(--secondary);
+    }
+
+    .text-destructive {
+      color: var(--destructive);
+    }
+
+    .text-muted {
+      color: var(--muted-foreground);
+    }
+
+    .border-accent {
+      border-color: var(--accent);
+    }
+
+    /* Remove arrows for number inputs */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 300px;
+      background-color: var(--accent);
+      color: var(--foreground);
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      top: 125%;
+      left: 50%;
+      margin-left: -150px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen flex flex-col">
+    <header class="w-full py-4 shadow-md border-b border-accent" style="background-color: var(--card);">
+      <div class="container mx-auto px-4 md:px-6">
+        <h1 class="text-xl md:text-2xl font-bold text-center text-primary">Speedcubing Average Calculator</h1>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 md:px-6 py-8 max-w-lg flex-1">
+      <!-- Input Section -->
+      <div class="card mb-6 p-6">
+        <h2 class="text-xl font-semibold mb-4 text-primary">Enter Solve Times</h2>
+        <p class="text-sm text-muted mb-5">
+          Enter times in hundredths of seconds (e.g., 859 = 8.59 seconds). Use 99999 for DNF.
+        </p>
+        
+        <div class="space-y-5" id="input-container">
+          <!-- Input fields will be generated here -->
+        </div>
+        
+        <div class="mt-6">
+          <button id="reset-button" class="w-full px-4 py-3 text-sm flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Reset All Times
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div class="card mb-6 p-6">
+        <h2 class="text-xl font-semibold mb-5 text-primary">Results</h2>
+        
+        <!-- Middle 3 Average -->
+        <div class="mb-7 border-b border-accent pb-5">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-md font-medium">Middle 3 Average (Ao5)</h3>
+            <div class="tooltip">
+              <button class="text-primary p-0 text-sm bg-transparent border-0 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Info
+              </button>
+              <span class="tooltiptext">
+                Middle 3 Average (Ao5): In competitive speedcubing, the average of 5 solves is calculated by removing the fastest and slowest times, then taking the average of the remaining 3 times. If you have 2 or more DNFs, the average is a DNF.
+              </span>
+            </div>
+          </div>
+          <p class="text-xs text-muted mb-3">Average of 5 times excluding fastest and slowest</p>
+          <div class="flex items-center">
+            <div class="result-box w-full">
+              <span id="middle-3-avg" class="font-mono text-3xl">--.-</span>
+            </div>
+          </div>
+          <div class="mt-3 text-sm text-muted">
+            <p class="font-mono">
+              Fastest: <span id="fastest-time" class="font-medium text-foreground">--.-</span>
+            </p>
+            <p class="font-mono">
+              Slowest: <span id="slowest-time" class="font-medium text-foreground">--.-</span>
+            </p>
+          </div>
+        </div>
+        
+        <!-- Best Possible Average -->
+        <div class="mb-7 border-b border-accent pb-5">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-md font-medium">Best Possible Average (BPA)</h3>
+            <div class="tooltip">
+              <button class="text-primary p-0 text-sm bg-transparent border-0 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Info
+              </button>
+              <span class="tooltiptext">
+                Best Possible Average (BPA): After completing 4 solves, this shows the best average you can achieve with your 5th solve. It assumes your 5th solve will be your fastest time possible, which gives you the mathematical best case scenario for your average.
+              </span>
+            </div>
+          </div>
+          <p class="text-xs text-muted mb-3">Best possible Ao5 after 4 solves</p>
+          <div class="flex items-center">
+            <div class="result-box w-full">
+              <span id="bpa" class="font-mono text-3xl text-secondary">--.-</span>
+            </div>
+          </div>
+          <p class="mt-3 text-sm text-muted">
+            After 4 solves, this is the best average you can achieve with an optimal 5th solve.
+          </p>
+        </div>
+        
+        <!-- Worst Possible Average -->
+        <div class="mb-2">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-md font-medium">Worst Possible Average (WPA)</h3>
+            <div class="tooltip">
+              <button class="text-primary p-0 text-sm bg-transparent border-0 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Info
+              </button>
+              <span class="tooltiptext">
+                Worst Possible Average (WPA): After completing 4 solves, this shows the worst average you would get if your 5th solve is a DNF. If you already have one DNF in your first 4 solves, having another DNF would result in a DNF average.
+              </span>
+            </div>
+          </div>
+          <p class="text-xs text-muted mb-3">Worst possible Ao5 after 4 solves</p>
+          <div class="flex items-center">
+            <div class="result-box w-full">
+              <span id="wpa" class="font-mono text-3xl text-destructive">--.-</span>
+            </div>
+          </div>
+          <p class="mt-3 text-sm text-muted">
+            This is what your average will be if your 5th solve is a DNF or very slow.
+          </p>
+        </div>
+      </div>
+
+      <!-- Explanation Section -->
+      <div class="card p-6">
+        <h2 class="text-xl font-semibold mb-4 text-primary">How It Works</h2>
+        <div class="text-sm text-muted space-y-4">
+          <p>Enter your times in hundredths of seconds. For example, a time of 12.34 seconds should be entered as 1234.</p>
+          <p>For a DNF (Did Not Finish), enter 99999.</p>
+          <p>The calculator provides three key metrics:</p>
+          <ul class="list-disc pl-5 space-y-2">
+            <li><strong>Middle 3 Average (Ao5):</strong> The average of 5 solves after removing the fastest and slowest times.</li>
+            <li><strong>Best Possible Average (BPA):</strong> After 4 solves, this shows the best average you can achieve with an optimal 5th solve.</li>
+            <li><strong>Worst Possible Average (WPA):</strong> After 4 solves, this shows the worst average you would get with a DNF on the 5th solve.</li>
+          </ul>
+          <p>All calculations follow official WCA competition rules for averages.</p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="w-full py-4 border-t border-accent" style="background-color: var(--card);">
+      <div class="container mx-auto px-4 text-center text-sm text-muted">
+        <p>Speedcubing Average Calculator | Designed for cubers</p>
+        <p class="mt-1 text-xs">All calculations follow WCA competition rules</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Constants
+    const DNF_VALUE = 99999;
+
+    // State
+    let solves = [null, null, null, null, null];
+    let formattedTimes = ["0.00s", "0.00s", "0.00s", "0.00s", "0.00s"];
+    let validInputs = [false, false, false, false, false];
+    let errorInputs = [false, false, false, false, false];
+
+    // Utility Functions
+    function formatTime(timeInHundredths) {
+      if (timeInHundredths === null) return "--.-";
+      if (timeInHundredths === DNF_VALUE) return "DNF";
+      
+      const seconds = timeInHundredths / 100;
+      return seconds.toFixed(2);
+    }
+
+    // Calculation Functions
+    function calculateMiddle3Average(solves) {
+      // We need all 5 solves for a middle 3 average
+      if (solves.some(s => s === null)) {
+        return { average: null, fastest: null, slowest: null };
+      }
+      
+      // Count DNFs
+      const validSolves = [...solves];
+      const dnfCount = validSolves.filter(s => s === DNF_VALUE).length;
+      
+      // Find fastest among valid times
+      const validTimes = validSolves.filter(s => s !== DNF_VALUE);
+      const fastest = validTimes.length > 0 ? Math.min(...validTimes) : null;
+      
+      // If 2 or more DNFs, the average is DNF (according to WCA rules)
+      if (dnfCount >= 2) {
+        return { 
+          average: DNF_VALUE, 
+          fastest, 
+          slowest: DNF_VALUE 
+        };
+      }
+      
+      // Make a copy to avoid modifying the original array
+      const solveTimes = [...validSolves];
+      
+      // If there's one DNF, it's the slowest time
+      if (dnfCount === 1) {
+        // Calculate the average of the middle 3 times (excluding fastest and DNF)
+        const middle3 = validTimes.filter(time => time !== fastest);
+        const average = middle3.reduce((sum, time) => sum + time, 0) / 3;
+        
+        return { 
+          average, 
+          fastest, 
+          slowest: DNF_VALUE 
+        };
+      } else {
+        // No DNFs, find fastest and slowest normally
+        const fastest = Math.min(...solveTimes);
+        const slowest = Math.max(...solveTimes);
+        
+        // Calculate the average of the middle 3 times (excluding fastest and slowest)
+        const middle3 = solveTimes.filter(time => time !== fastest && time !== slowest);
+        const average = middle3.reduce((sum, time) => sum + time, 0) / 3;
+        
+        return { 
+          average, 
+          fastest, 
+          slowest 
+        };
+      }
+    }
+
+    function calculateBPA(solves) {
+      // We need at least the first 4 solves to calculate BPA
+      const first4Solves = solves.slice(0, 4);
+      if (first4Solves.some(s => s === null)) {
+        return null;
+      }
+      
+      // Count DNFs in first 4 solves
+      const validSolves = [...first4Solves];
+      const dnfCount = validSolves.filter(s => s === DNF_VALUE).length;
+      
+      // If more than one DNF in first 4, BPA is DNF
+      if (dnfCount > 1) {
+        return DNF_VALUE;
+      }
+      
+      // Get all non-DNF times
+      const nonDnfTimes = validSolves.filter(s => s !== DNF_VALUE);
+      
+      // If one DNF, it will be excluded as the slowest time
+      if (dnfCount === 1) {
+        // Take the fastest 3 times (all non-DNF times since there are exactly 3)
+        const sum = nonDnfTimes.reduce((acc, time) => acc + time, 0);
+        // BPA is the average of these 3 times
+        return sum / 3;
+      } else {
+        // No DNFs, so we have 4 valid times
+        // Sort times in ascending order
+        const sortedTimes = [...nonDnfTimes].sort((a, b) => a - b);
+        // Take the fastest 3 times (ignoring the slowest time)
+        const fastestThree = sortedTimes.slice(0, 3);
+        const sum = fastestThree.reduce((acc, time) => acc + time, 0);
+        // BPA is the average of the fastest 3 times
+        return sum / 3;
+      }
+    }
+
+    function calculateWPA(solves) {
+      // We need at least the first 4 solves to calculate WPA
+      const first4Solves = solves.slice(0, 4);
+      if (first4Solves.some(s => s === null)) {
+        return null;
+      }
+      
+      // Count DNFs in first 4 solves
+      const validSolves = [...first4Solves];
+      const dnfCount = validSolves.filter(s => s === DNF_VALUE).length;
+      
+      // If there's already one or more DNF, the WPA is DNF (since adding another DNF makes at least 2 DNFs)
+      if (dnfCount >= 1) {
+        return DNF_VALUE;
+      }
+      
+      // No DNFs in first 4 solves
+      // Calculate the WPA assuming the 5th solve is DNF
+      
+      // For WPA, if the 5th solve is DNF, it becomes the slowest time (which is dropped)
+      // We then need to drop the fastest time among the first 4 solves
+      // And average the middle 3 times
+      
+      // Sort the times in ascending order (fastest to slowest)
+      const sortedTimes = [...validSolves].sort((a, b) => a - b);
+      
+      // Remove the fastest time (index 0)
+      const withoutFastest = sortedTimes.slice(1);
+      
+      // WPA is the average of the 3 remaining times
+      const sum = withoutFastest.reduce((acc, time) => acc + time, 0);
+      return sum / 3;
+    }
+
+    // DOM Elements
+    const inputContainer = document.getElementById('input-container');
+    const resetButton = document.getElementById('reset-button');
+    const middle3AvgElement = document.getElementById('middle-3-avg');
+    const fastestTimeElement = document.getElementById('fastest-time');
+    const slowestTimeElement = document.getElementById('slowest-time');
+    const bpaElement = document.getElementById('bpa');
+    const wpaElement = document.getElementById('wpa');
+
+    // Initialize input fields
+    function createInputFields() {
+      inputContainer.innerHTML = '';
+      
+      for (let i = 0; i < 5; i++) {
+        const inputWrapper = document.createElement('div');
+        
+        const label = document.createElement('label');
+        label.setAttribute('for', `solve-${i}`);
+        label.className = 'block text-sm font-medium mb-2';
+        label.textContent = `Solve ${i + 1}`;
+        
+        const inputContainer = document.createElement('div');
+        inputContainer.className = 'relative';
+        
+        const input = document.createElement('input');
+        input.id = `solve-${i}`;
+        input.type = 'number';
+        input.className = 'w-full';
+        input.placeholder = 'Enter time in hundredths';
+        input.min = 0;
+        input.max = 99999;
+        input.dataset.index = i;
+        
+        input.addEventListener('input', handleTimeInput);
+        input.addEventListener('focus', (e) => e.currentTarget.select());
+        
+        const statusIcon = document.createElement('div');
+        statusIcon.className = 'absolute right-3 top-2.5 hidden';
+        statusIcon.id = `status-${i}`;
+        
+        const formattedDisplay = document.createElement('p');
+        formattedDisplay.className = 'mt-1 text-xs text-muted';
+        formattedDisplay.id = `formatted-time-${i}`;
+        formattedDisplay.textContent = formattedTimes[i];
+        
+        inputContainer.appendChild(input);
+        inputContainer.appendChild(statusIcon);
+        
+        inputWrapper.appendChild(label);
+        inputWrapper.appendChild(inputContainer);
+        inputWrapper.appendChild(formattedDisplay);
+        
+        inputContainer.appendChild(input);
+        
+        this.inputContainer.appendChild(inputWrapper);
+      }
+    }
+
+    // Event Handlers
+    function handleTimeInput(e) {
+      const index = parseInt(e.target.dataset.index);
+      const value = e.target.value.trim();
+      
+      // Get status icons and formatted time displays
+      const statusIcon = document.getElementById(`status-${index}`);
+      const formattedDisplay = document.getElementById(`formatted-time-${index}`);
+      
+      // Reset validations
+      validInputs[index] = false;
+      errorInputs[index] = false;
+      statusIcon.className = 'absolute right-3 top-2.5 hidden';
+      
+      // Clear the field if empty
+      if (value === '') {
+        solves[index] = null;
+        formattedTimes[index] = "0.00s";
+        formattedDisplay.textContent = "0.00s";
+      } else {
+        const timeValue = parseInt(value);
+        
+        // Validate input
+        if (!isNaN(timeValue) && timeValue >= 0 && timeValue <= DNF_VALUE) {
+          solves[index] = timeValue;
+          validInputs[index] = true;
+          
+          // Format time display
+          if (timeValue === DNF_VALUE) {
+            formattedTimes[index] = "DNF";
+          } else {
+            formattedTimes[index] = `${formatTime(timeValue)}s`;
+          }
+          
+          // Show valid icon
+          statusIcon.className = 'absolute right-3 top-2.5 text-secondary';
+          statusIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        } else {
+          // Show error for invalid input
+          errorInputs[index] = true;
+          formattedTimes[index] = "Invalid";
+          solves[index] = null;
+          
+          // Show error icon
+          statusIcon.className = 'absolute right-3 top-2.5 text-destructive';
+          statusIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+        }
+        
+        formattedDisplay.textContent = formattedTimes[index];
+      }
+      
+      // Update calculations
+      updateCalculations();
+    }
+
+    function resetInputs() {
+      // Clear all input fields
+      const inputs = document.querySelectorAll('input[type="number"]');
+      inputs.forEach(input => {
+        input.value = '';
+      });
+      
+      // Reset all state
+      solves = [null, null, null, null, null];
+      formattedTimes = ["0.00s", "0.00s", "0.00s", "0.00s", "0.00s"];
+      validInputs = [false, false, false, false, false];
+      errorInputs = [false, false, false, false, false];
+      
+      // Update display
+      for (let i = 0; i < 5; i++) {
+        const statusIcon = document.getElementById(`status-${i}`);
+        const formattedDisplay = document.getElementById(`formatted-time-${i}`);
+        
+        statusIcon.className = 'absolute right-3 top-2.5 hidden';
+        formattedDisplay.textContent = "0.00s";
+      }
+      
+      // Reset results
+      middle3AvgElement.textContent = "--.-";
+      fastestTimeElement.textContent = "--.-";
+      slowestTimeElement.textContent = "--.-";
+      bpaElement.textContent = "--.-";
+      wpaElement.textContent = "--.-";
+    }
+
+    function updateCalculations() {
+      // Calculate Middle 3 Average
+      const middle3Results = calculateMiddle3Average(solves);
+      
+      if (middle3Results.average === null) {
+        middle3AvgElement.textContent = "--.-";
+      } else if (middle3Results.average === DNF_VALUE) {
+        middle3AvgElement.textContent = "DNF";
+      } else {
+        middle3AvgElement.textContent = formatTime(middle3Results.average);
+      }
+      
+      if (middle3Results.fastest === null) {
+        fastestTimeElement.textContent = "--.-";
+      } else {
+        fastestTimeElement.textContent = formatTime(middle3Results.fastest);
+      }
+      
+      if (middle3Results.slowest === null) {
+        slowestTimeElement.textContent = "--.-";
+      } else if (middle3Results.slowest === DNF_VALUE) {
+        slowestTimeElement.textContent = "DNF";
+      } else {
+        slowestTimeElement.textContent = formatTime(middle3Results.slowest);
+      }
+      
+      // Calculate BPA
+      const bpaResult = calculateBPA(solves);
+      if (bpaResult === null) {
+        bpaElement.textContent = "--.-";
+      } else if (bpaResult === DNF_VALUE) {
+        bpaElement.textContent = "DNF";
+      } else {
+        bpaElement.textContent = formatTime(bpaResult);
+      }
+      
+      // Calculate WPA
+      const wpaResult = calculateWPA(solves);
+      if (wpaResult === null) {
+        wpaElement.textContent = "--.-";
+      } else if (wpaResult === DNF_VALUE) {
+        wpaElement.textContent = "DNF";
+      } else {
+        wpaElement.textContent = formatTime(wpaResult);
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      createInputFields();
+      resetButton.addEventListener('click', resetInputs);
+    });
+  </script>
+</body>
+</html>
